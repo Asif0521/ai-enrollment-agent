@@ -1,0 +1,289 @@
+{
+  "name": "Enrollment Management Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "student-enroll",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "node-1",
+      "name": "Student Enrollment Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "student-enroll-001"
+    },
+    {
+      "parameters": {
+        "functionCode": "const body = items[0].json.body || items[0].json;\nconst skills = body.skills;\nconst career_goal = body.career_goal;\n\nif (!skills || String(skills).trim() === '') {\n  throw new Error('Validation Error: skills field is required.');\n}\nif (!career_goal || String(career_goal).trim() === '') {\n  throw new Error('Validation Error: career_goal field is required.');\n}\n\nreturn [{\n  json: {\n    name: body.name || '',\n    email: body.email || '',\n    skills: String(skills),\n    career_goal: String(career_goal),\n    gpa: Number(body.gpa) || 0\n  }\n}];"
+      },
+      "id": "node-2",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const item = items[0].json;\nreturn [{\n  json: {\n    name: item.name,\n    email: item.email,\n    skills: item.skills,\n    career_goal: item.career_goal,\n    gpa: item.gpa,\n    profile: item.skills + ' ' + item.career_goal\n  }\n}];"
+      },
+      "id": "node-3",
+      "name": "Transform Data",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://localhost:5000/recommend",
+        "sendBody": true,
+        "bodyType": "json",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "profile",
+              "value": "={{ $json.profile }}"
+            },
+            {
+              "name": "gpa",
+              "value": "={{ $json.gpa }}"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          }
+        }
+      },
+      "id": "node-4",
+      "name": "AI Model API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const aiData = items[0].json;\nconst studentData = $node['Transform Data'].json;\n\nconst score = Number(aiData.fit_score) || 0;\nlet fit_level;\nif (score >= 80) {\n  fit_level = 'High';\n} else if (score >= 60) {\n  fit_level = 'Medium';\n} else {\n  fit_level = 'Low';\n}\n\nreturn [{\n  json: {\n    name: studentData.name,\n    email: studentData.email,\n    skills: studentData.skills,\n    career_goal: studentData.career_goal,\n    gpa: studentData.gpa,\n    recommended_course: aiData.recommended_course || 'General Course',\n    fit_score: score,\n    fit_level: fit_level\n  }\n}];"
+      },
+      "id": "node-5",
+      "name": "Fit Score Logic",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Enrollments",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ new Date().toISOString() }}",
+            "Name": "={{ $json.name }}",
+            "Email": "={{ $json.email }}",
+            "Skills": "={{ $json.skills }}",
+            "Career Goal": "={{ $json.career_goal }}",
+            "GPA": "={{ $json.gpa }}",
+            "Recommended Course": "={{ $json.recommended_course }}",
+            "Fit Score": "={{ $json.fit_score }}",
+            "Fit Level": "={{ $json.fit_level }}"
+          }
+        },
+        "options": {
+          "valueInputMode": "USER_ENTERED"
+        }
+      },
+      "id": "node-6",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1340,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.email }}",
+        "subject": "Your Course Recommendation - Techu Innovations Labs",
+        "emailType": "text",
+        "message": "=Hello {{ $json.name }},\n\nThank you for registering with Techu Innovations Labs!\n\nBased on your profile, our AI has generated the following recommendation:\n\n  Recommended Course : {{ $json.recommended_course }}\n  Fit Score         : {{ $json.fit_score }} / 100\n  Fit Level         : {{ $json.fit_level }}\n\nWe believe this course is the perfect match for your skills and career goals.\n\nClick below to enroll:\nhttps://techu.in/enroll\n\nBest regards,\nTechu Innovations Labs\nMadhapur, Hyderabad",
+        "options": {}
+      },
+      "id": "node-7",
+      "name": "Send Recommendation Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1560,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.powerbi.com/v1.0/myorg/datasets/YOUR_DATASET_ID/refreshes",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer YOUR_POWERBI_TOKEN"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": false
+            }
+          },
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "id": "node-8",
+      "name": "Trigger Power BI Refresh",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1780,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Student Enrollment Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Input": {
+      "main": [
+        [
+          {
+            "node": "Transform Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transform Data": {
+      "main": [
+        [
+          {
+            "node": "AI Model API Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Model API Call": {
+      "main": [
+        [
+          {
+            "node": "Fit Score Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fit Score Logic": {
+      "main": [
+        [
+          {
+            "node": "Log to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Send Recommendation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Recommendation Email": {
+      "main": [
+        [
+          {
+            "node": "Trigger Power BI Refresh",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": [
+    {
+      "name": "Student Success"
+    },
+    {
+      "name": "AI Agent"
+    },
+    {
+      "name": "Enrollment"
+    }
+  ],
+  "triggerCount": 1,
+  "versionId": "v3-enrollment-agent"
+}
