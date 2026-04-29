@@ -1,5 +1,5 @@
-// REPLACE THIS with your actual n8n Webhook URL once n8n is running publicly, or leave it for local testing
-const WEBHOOK_URL = "http://localhost:5678/webhook/student-enroll";
+// Production n8n Webhook URL
+const WEBHOOK_URL = "https://n8nds.duckdns.org/webhook/student-enroll";
 
 document.addEventListener('DOMContentLoaded', () => {
     const gpaInput = document.getElementById('gpa');
