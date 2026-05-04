@@ -48,9 +48,7 @@ class StudentProfile(BaseModel):
 @app.post("/recommend")
 async def recommend_course(profile: StudentProfile):
     vectorizer = TfidfVectorizer(stop_words='english')
-    
-    best_course = "General Technical Program"
-    highest_score = 0
+    results = []
     
     for course in COURSES:
         # 1. Skill Match (50% weight)
@@ -63,20 +61,31 @@ async def recommend_course(profile: StudentProfile):
         goal_matrix = vectorizer.fit_transform(goal_corpus)
         goal_alignment = cosine_similarity(goal_matrix[0:1], goal_matrix[1:2])[0][0]
         
-        # 3. Academic Strength (20% weight, max GPA assumed 10.0)
+        # 3. Academic Strength (20% weight)
         academic_strength = min(profile.gpa / 10.0, 1.0)
         
         # Calculate final Fit Score (out of 100)
         fit_score = (0.5 * skill_match + 0.3 * goal_alignment + 0.2 * academic_strength) * 100
+        fit_score = max(0.0, min(100.0, round(fit_score, 2)))
         
-        if fit_score > highest_score:
-            highest_score = fit_score
-            best_course = course["name"]
+        # Determine Fit Level
+        if fit_score >= 80:
+            fit_level = "High"
+        elif fit_score >= 60:
+            fit_level = "Medium"
+        else:
+            fit_level = "Low"
+            
+        results.append({
+            "course_name": course["name"],
+            "fit_score": fit_score,
+            "fit_level": fit_level
+        })
 
-    # Floor at 0, cap at 100
-    highest_score = max(0.0, min(100.0, round(highest_score, 2)))
+    # Sort by fit_score descending and take Top 3
+    results.sort(key=lambda x: x["fit_score"], reverse=True)
+    top_3 = results[:3]
 
     return {
-        "recommended_course": best_course,
-        "fit_score": highest_score
+        "recommendations": top_3
     }

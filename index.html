@@ -3,124 +3,542 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Techu AI | Enrollment Portal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <title>TechU Research Labs | AI & Full-Stack Courses</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app-layout">
-        <!-- Left Side: Hero / Branding -->
-        <aside class="hero-section">
-            <div class="hero-background">
-                <div class="glow-orb primary-orb"></div>
-                <div class="glow-orb secondary-orb"></div>
-                <div class="grid-overlay"></div>
+
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+            <i class="ph-fill ph-rocket-launch" style="font-size: 2.2rem; color: #5a3c8e;"></i>
+            <div class="logo-text">
+                <span style="color: #3a225e;">TechU</span>
+                <span style="color: #ac2774;">RESEARCH LABS PVT LTD</span>
             </div>
-            
+        </div>
+        <div class="nav-links">
+            <a href="#courses">Courses</a>
+        </div>
+
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-grid-overlay"></div>
+        <div class="hero-container">
+            <!-- Left Side -->
             <div class="hero-content">
-                <div class="logo">
-                    <i class="ph-fill ph-planet"></i>
-                    <span>Techu AI Labs</span>
+                <div class="hero-badge">
+                    <span></span> Powered by TechU
                 </div>
+                <h1 class="hero-title">Kickstart Your Career<br>with <u>Job-Ready Tech<br>Courses</u></h1>
+                <p class="hero-subtitle">Make 2026 your year of growth. Unlock limitless opportunities with TechU. Learn from expert mentors with real projects and placement support.</p>
                 
-                <h1 class="hero-title">Discover your<br>perfect tech<br><span class="text-gradient">trajectory.</span></h1>
-                <p class="hero-subtitle">Our proprietary AI engine analyzes your skills, academic background, and career aspirations to perfectly match you with an elite learning path.</p>
-                
-                <div class="features-list">
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="ph ph-brain"></i></div>
-                        <div>
-                            <h4>Smart Matching</h4>
-                            <p>NLP-powered skill analysis</p>
-                        </div>
+                <div class="hero-checks">
+                    <div class="hero-check-item"><i class="ph-fill ph-check-circle"></i> 4.95 Avg Rating</div>
+                    <div class="hero-check-item"><i class="ph-fill ph-check-circle"></i> 500+ Learner Reviews</div>
+                    <div class="hero-check-item"><i class="ph-fill ph-check-circle"></i> 100% Satisfied Students</div>
+                </div>
+
+                <div class="hero-actions">
+                    <button class="btn btn-orange" onclick="document.getElementById('courses').scrollIntoView()">Explore Courses <i class="ph-bold ph-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <!-- Right Side Image -->
+            <div class="hero-image-wrapper">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80" alt="Students learning">
+                <div class="hero-floating-badge">
+                    <span class="live-tag"><i class="ph-fill ph-broadcast"></i> LIVE</span> Register for <span style="color:var(--accent-magenta);">Free Demo</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Courses Grid Section -->
+    <section id="courses" class="courses-section">
+        <div class="course-tabs-container">
+            <div class="arrow-tabs">
+                <button class="arrow-tab active">Offline</button>
+                <button class="arrow-tab">Online</button>
+                <button class="arrow-tab">Recorded</button>
+            </div>
+        </div>
+
+        <div class="courses-grid">
+            <!-- Full Stack -->
+            <div class="course-card">
+                <div class="card-image-wrapper">
+                    <div class="badge-top-left"><i class="ph-bold ph-map-pin"></i> Offline</div>
+                    <div class="badge-top-right">Upcoming Batch</div>
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=600&q=80" alt="Full Stack">
+                </div>
+                <div class="card-content">
+                    <h3>Full Stack Development</h3>
+                    <div class="course-meta">
+                        <div class="meta-item star-rating"><i class="ph-fill ph-star"></i> 4.9</div>
+                        <div class="meta-item"><i class="ph-bold ph-users"></i> 3,567</div>
+                        <div class="meta-item"><i class="ph-bold ph-clock"></i> 4 Months</div>
+                        <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
-                    <div class="feature-item">
-                        <div class="feature-icon"><i class="ph ph-target"></i></div>
-                        <div>
-                            <h4>Goal Alignment</h4>
-                            <p>Career-focused trajectory mapping</p>
-                        </div>
+                    <div class="card-actions">
+                        <button class="btn btn-orange enroll-direct-btn" data-course="Full Stack Development" data-price="99,000">Enroll Now</button>
+                        <button class="btn btn-outline-magenta view-details-btn" data-course="Full Stack Development" data-price="99,000" data-old="1,40,000" data-save="41,000">View Details</button>
                     </div>
                 </div>
             </div>
-        </aside>
 
-        <!-- Right Side: Application Form -->
-        <main class="form-section">
-            <div class="form-container">
-                <div class="form-header">
-                    <h2>Application Portal</h2>
-                    <p>Enter your details below to initiate the AI assessment.</p>
+            <!-- Data Science -->
+            <div class="course-card">
+                <div class="card-image-wrapper">
+                    <div class="badge-top-left"><i class="ph-bold ph-map-pin"></i> Offline</div>
+                    <div class="badge-top-right" style="background:#e11d48;">Next Batch Starting Soon</div>
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=600&q=80" alt="Data Science">
                 </div>
-
-                <form id="enrollmentForm" class="enrollment-form">
-                    
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label for="name">Full Name</label>
-                            <div class="input-wrapper">
-                                <i class="ph ph-user input-icon"></i>
-                                <input type="text" id="name" placeholder="John Doe" required>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="email">Work/School Email</label>
-                            <div class="input-wrapper">
-                                <i class="ph ph-envelope-simple input-icon"></i>
-                                <input type="email" id="email" placeholder="john@example.com" required>
-                            </div>
-                        </div>
+                <div class="card-content">
+                    <h3>Data Science with AI/ML</h3>
+                    <div class="course-meta">
+                        <div class="meta-item star-rating"><i class="ph-fill ph-star"></i> 4.8</div>
+                        <div class="meta-item"><i class="ph-bold ph-users"></i> 2,980</div>
+                        <div class="meta-item"><i class="ph-bold ph-clock"></i> 4 Months</div>
+                        <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
-
-                    <div class="input-group">
-                        <label for="career_goal">Desired Career Goal</label>
-                        <div class="input-wrapper">
-                            <i class="ph ph-briefcase input-icon"></i>
-                            <input type="text" id="career_goal" placeholder="e.g. Lead Machine Learning Engineer" required>
-                        </div>
+                    <div class="card-actions">
+                        <button class="btn btn-orange enroll-direct-btn" data-course="Data Science with AI/ML" data-price="85,000">Enroll Now</button>
+                        <button class="btn btn-outline-magenta view-details-btn" data-course="Data Science with AI/ML" data-price="85,000" data-old="1,20,000" data-save="35,000">View Details</button>
                     </div>
+                </div>
+            </div>
 
-                    <div class="input-group">
-                        <label for="skills">Technical & Soft Skills</label>
-                        <div class="input-wrapper">
-                            <i class="ph ph-code input-icon textarea-icon"></i>
-                            <textarea id="skills" rows="3" placeholder="e.g. Python, SQL, Team Leadership, AWS..." required></textarea>
-                        </div>
+            <!-- UI/UX -->
+            <div class="course-card">
+                <div class="card-image-wrapper">
+                    <div class="badge-top-left"><i class="ph-bold ph-map-pin"></i> Offline</div>
+                    <div class="badge-top-right">Upcoming Batch</div>
+                    <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=600&q=80" alt="UI UX">
+                </div>
+                <div class="card-content">
+                    <h3>UI/UX Design</h3>
+                    <div class="course-meta">
+                        <div class="meta-item star-rating"><i class="ph-fill ph-star"></i> 4.9</div>
+                        <div class="meta-item"><i class="ph-bold ph-users"></i> 3,210</div>
+                        <div class="meta-item"><i class="ph-bold ph-clock"></i> 3 Months</div>
+                        <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
-
-                    <div class="input-group slider-group">
-                        <div class="slider-header">
-                            <label for="gpa">Academic Standing (GPA)</label>
-                            <span id="gpa-value" class="gpa-badge">7.5 <span class="gpa-max">/ 10.0</span></span>
-                        </div>
-                        <div class="range-wrapper">
-                            <input type="range" id="gpa" min="0" max="10" step="0.1" value="7.5">
-                            <div class="range-track"></div>
-                        </div>
+                    <div class="card-actions">
+                        <button class="btn btn-orange enroll-direct-btn" data-course="UI/UX Design" data-price="65,000">Enroll Now</button>
+                        <button class="btn btn-outline-magenta view-details-btn" data-course="UI/UX Design" data-price="65,000" data-old="95,000" data-save="30,000">View Details</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-                    <button type="submit" id="submitBtn" class="submit-btn">
-                        <span>Initialize AI Assessment</span>
-                        <i class="ph ph-arrow-right btn-icon"></i>
-                        <div class="loader" id="loader"></div>
-                    </button>
-                </form>
-
-                <!-- Success Result Card -->
-                <div id="resultCard" class="result-card hidden">
-                    <div class="success-icon-wrapper">
+    <!-- Course Details / Amount Page (Hidden by default) -->
+    <section id="course-details" class="course-details-section hidden">
+        <div class="details-container">
+            <!-- Left Side: Details -->
+            <div class="details-content">
+                <div class="status-badge"><span style="color:var(--accent-magenta);">•</span> Enrollment Open for 2026</div>
+                <h1 id="details-title">Course Name</h1>
+                <h3>Build industry-ready skills and transform your career.</h3>
+                <p class="desc">Master industry-leading technologies and integrate modern workflows into production-ready applications.</p>
+                
+                <div class="feature-list">
+                    <div class="feature-list-item">
                         <i class="ph-fill ph-check-circle"></i>
+                        <span>Online & Classroom Real-Time training</span>
                     </div>
-                    <h3>Assessment Complete!</h3>
-                    <p>Your profile has been processed by our AI engine. A personalized recommendation and fit score report has been dispatched to your inbox.</p>
-                    <button class="secondary-btn" onclick="window.location.reload()">Process Another Application</button>
+                    <div class="feature-list-item">
+                        <i class="ph-fill ph-check-circle"></i>
+                        <span>Project & Task Based Learning</span>
+                    </div>
+                    <div class="feature-list-item">
+                        <i class="ph-fill ph-check-circle"></i>
+                        <span>24/7 Learning Support</span>
+                    </div>
+                    <div class="feature-list-item">
+                        <i class="ph-fill ph-check-circle"></i>
+                        <span>Interviews & Placement Support</span>
+                    </div>
+                </div>
+
+                <div class="featured-actions">
+                    <a href="#" id="download-brochure-btn" class="btn btn-outline-magenta" style="text-decoration: none;"><i class="ph-bold ph-download-simple"></i> Download Brochure</a>
                 </div>
             </div>
-        </main>
-    </div>
+
+            <!-- Right Side: Pricing Card (Amount Page) -->
+            <div class="pricing-card">
+                <div class="price-header">
+                    <span class="price-current" id="details-price">₹--</span>
+                    <span class="price-old" id="details-old-price">₹--</span>
+                </div>
+                <div class="save-badge" id="details-save">Save ₹-- Limited Time</div>
+                <p class="emi-text">Or flexible EMI options available</p>
+
+                <h4 class="card-section-title">Select Upcoming Batch</h4>
+                <div class="batch-grid" id="batch-selection">
+                    <div class="batch-box active" data-batch="12 May">
+                        <div class="batch-date">12</div>
+                        <div class="batch-month">May</div>
+                        <div class="batch-seats">12 Seats</div>
+                    </div>
+                    <div class="batch-box" data-batch="26 May">
+                        <div class="batch-date">26</div>
+                        <div class="batch-month">May</div>
+                        <div class="batch-seats">8 Seats</div>
+                    </div>
+                    <div class="batch-box" data-batch="09 Jun">
+                        <div class="batch-date">9</div>
+                        <div class="batch-month">Jun</div>
+                        <div class="batch-seats">10 Seats</div>
+                    </div>
+                    <div class="batch-box" data-batch="23 Jun">
+                        <div class="batch-date">23</div>
+                        <div class="batch-month">Jun</div>
+                        <div class="batch-seats">15 Seats</div>
+                    </div>
+                </div>
+
+                <h4 class="card-section-title">Select Learning Mode</h4>
+                <div class="mode-grid" id="mode-selection">
+                    <div class="mode-box active" data-mode="Online Live">
+                        <div class="mode-title">Online Live</div>
+                        <div class="mode-desc">Live classes</div>
+                    </div>
+                    <div class="mode-box" data-mode="Offline (Hyderabad)">
+                        <div class="mode-title">Offline</div>
+                        <div class="mode-desc">Hyderabad</div>
+                    </div>
+                    <div class="mode-box" data-mode="Recorded">
+                        <div class="mode-title">Recorded</div>
+                        <div class="mode-desc">Self-paced</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-orange enroll-full-btn" id="confirm-enroll-btn">Enroll Now</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enrollment Success Section (Hidden by default) -->
+    <section id="enrollment-success" class="course-details-section hidden" style="background: var(--bg-base); text-align: center;">
+        <div style="max-width: 600px; margin: 0 auto; background: white; padding: 4rem; border-radius: 24px; box-shadow: var(--shadow-lg); border: 1px solid var(--border-subtle);">
+            <i class="ph-fill ph-check-circle" style="font-size: 5rem; color: var(--success); margin-bottom: 1rem;"></i>
+            <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-primary); margin-bottom: 0.5rem;">Enrollment Successful!</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2.5rem; font-size: 1.1rem;">You have successfully enrolled in your preferred course. Here are your details:</p>
+            
+            <div style="background: #f8fafc; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 2rem; text-align: left; margin-bottom: 2rem;">
+                <div style="margin-bottom: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Course</span>
+                    <h3 id="success-course-name" style="font-size: 1.25rem; font-weight: 800; color: var(--text-primary); margin-top: 0.25rem;">--</h3>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Batch Date</span>
+                        <p id="success-batch" style="font-weight: 700; color: var(--text-primary); margin-top: 0.25rem;">--</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Learning Mode</span>
+                        <p id="success-mode" style="font-weight: 700; color: var(--text-primary); margin-top: 0.25rem;">--</p>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase;">Amount Paid</span>
+                        <p id="success-price" style="font-weight: 700; color: var(--accent-orange); margin-top: 0.25rem; font-size: 1.2rem;">₹--</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-orange" style="width: 100%;" onclick="location.reload()">Back to Home</button>
+        </div>
+    </section>
+
+    <!-- AI Assessment / Enrollment Form -->
+    <section id="ai-form" class="enrollment-section">
+        <div class="form-container">
+            <div class="form-header">
+                <h2>Not sure which course? AI Can Help!</h2>
+                <p>Let our proprietary AI engine analyze your profile and find your perfect match.</p>
+            </div>
+
+            <form id="enrollmentForm" class="enrollment-form">
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="name">Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-user input-icon"></i>
+                            <input type="text" id="name" placeholder="John Doe" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-envelope input-icon"></i>
+                            <input type="email" id="email" placeholder="john@example.com" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="phone">Phone Number</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-phone input-icon"></i>
+                            <input type="text" id="phone" placeholder="+91 90000 00000" required>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="location">Location</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-map-pin input-icon"></i>
+                            <input type="text" id="location" placeholder="Hyderabad, India" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="education">Current Education Level</label>
+                    <div class="input-wrapper">
+                        <i class="ph-bold ph-graduation-cap input-icon"></i>
+                        <select id="education" required class="custom-select">
+                            <option value="" disabled selected>Select your level</option>
+                            <option value="High School">High School</option>
+                            <option value="Undergraduate">Undergraduate Student</option>
+                            <option value="Graduate">Graduate (Bachelor's)</option>
+                            <option value="Post-Graduate">Post-Graduate (Master's/PhD)</option>
+                            <option value="Professional">Working Professional</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="career_goal">Desired Career Goal</label>
+                    <div class="input-wrapper">
+                        <i class="ph-bold ph-briefcase input-icon"></i>
+                        <input type="text" id="career_goal" list="goals_list" placeholder="e.g. Data Scientist, Full Stack Developer" required>
+                        <datalist id="goals_list">
+                            <option value="Data Scientist">
+                            <option value="Full Stack Developer">
+                            <option value="UI/UX Designer">
+                            <option value="AI/ML Engineer">
+                            <option value="Product Manager">
+                        </datalist>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="skills">Technical & Soft Skills</label>
+                    <div class="input-wrapper">
+                        <i class="ph-bold ph-code input-icon textarea-icon"></i>
+                        <textarea id="skills" list="skills_list" rows="3" placeholder="e.g. Python, SQL, React, Communication" required></textarea>
+                    </div>
+                </div>
+
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-primary); font-size: 1.2rem;">Pre-Enrollment Questionnaire</h3>
+                
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="programming_exp">Prior Programming Experience?</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-code-block input-icon"></i>
+                            <select id="programming_exp" required class="custom-select">
+                                <option value="" disabled selected>Select an option</option>
+                                <option value="None">No prior experience</option>
+                                <option value="Beginner">Beginner (Basic concepts)</option>
+                                <option value="Intermediate">Intermediate (Have built small projects)</option>
+                                <option value="Advanced">Advanced (Professional/Complex projects)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="time_commitment">Weekly Time Commitment</label>
+                        <div class="input-wrapper">
+                            <i class="ph-bold ph-clock input-icon"></i>
+                            <select id="time_commitment" required class="custom-select">
+                                <option value="" disabled selected>Select an option</option>
+                                <option value="Less than 10 hours">Less than 10 hours</option>
+                                <option value="10-20 hours">10-20 hours</option>
+                                <option value="20-30 hours">20-30 hours</option>
+                                <option value="More than 30 hours">More than 30 hours</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="course_expectations">What are your expectations from this course?</label>
+                    <div class="input-wrapper">
+                        <i class="ph-bold ph-chat-text input-icon textarea-icon"></i>
+                        <textarea id="course_expectations" rows="3" placeholder="e.g. I want to build a portfolio, get a job, learn a specific framework..." required></textarea>
+                    </div>
+                </div>
+
+
+                <div class="input-group slider-group">
+                    <div class="slider-header">
+                        <label for="gpa">Academic Standing (GPA)</label>
+                        <span id="gpa-value" class="gpa-badge">7.5 <span class="gpa-max">/ 10.0</span></span>
+                    </div>
+                    <div class="range-wrapper">
+                        <input type="range" id="gpa" min="0" max="10" step="0.1" value="7.5">
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-outline-magenta submit-btn">
+                    <span>Submit</span>
+                    <i class="ph-bold ph-arrow-right btn-icon"></i>
+                    <div class="loader" id="loader"></div>
+                </button>
+            </form>
+
+            <!-- Success Result Card -->
+            <div id="resultCard" class="result-card hidden">
+                <div class="success-header text-center">
+                    <div class="success-icon-wrapper">
+                        <i class="ph-fill ph-sparkle text-orange"></i>
+                    </div>
+                    <h3 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-primary);">Your Top AI Matches</h3>
+                    <p style="color: var(--text-secondary);">Our engine analyzed your profile and found these elite learning paths for you.</p>
+                    <div style="margin-top: 1rem; color: var(--accent-magenta); font-weight: 600; font-size: 0.9rem;">
+                        <i class="ph-fill ph-envelope-simple"></i> Detailed report sent to your email!
+                    </div>
+                </div>
+
+                <div id="recommendationsList" class="recommendations-grid">
+                    <!-- Dynamic Course Cards will be injected here via script.js -->
+                </div>
+
+                <div class="selection-footer" style="text-align: center; margin-top: 2rem;">
+                    <button class="btn btn-outline-magenta" onclick="window.location.reload()">Start New Assessment</button>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <script src="script.js"></script>
+    <script>
+        // Tab switching
+        document.querySelectorAll('.arrow-tab').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                const selectedMode = e.currentTarget.textContent.trim();
+                document.querySelectorAll('.arrow-tab').forEach(t => t.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+
+                // Update all course card badges
+                document.querySelectorAll('.badge-top-left').forEach(badge => {
+                    badge.innerHTML = `<i class="ph-bold ph-map-pin"></i> ${selectedMode}`;
+                });
+            });
+        });
+
+        // Batch / Mode visual selection
+        document.querySelectorAll('.batch-box').forEach(box => {
+            box.addEventListener('click', (e) => {
+                document.querySelectorAll('.batch-box').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.mode-box').forEach(box => {
+            box.addEventListener('click', (e) => {
+                document.querySelectorAll('.mode-box').forEach(b => b.classList.remove('active'));
+                e.currentTarget.classList.add('active');
+            });
+        });
+
+        // Dynamic Amount Page View
+        const detailsSection = document.getElementById('course-details');
+        const detailsTitle = document.getElementById('details-title');
+        const detailsPrice = document.getElementById('details-price');
+        const detailsOldPrice = document.getElementById('details-old-price');
+        const detailsSave = document.getElementById('details-save');
+        let currentSelectedCourse = "";
+        let currentSelectedPrice = "";
+
+        window.showCourseDetails = function(courseName, price, oldPrice, save) {
+            currentSelectedCourse = courseName;
+            currentSelectedPrice = price;
+
+            detailsTitle.innerHTML = courseName.replace(' with ', '<br>with ').replace(' + ', '<br>+ ');
+            detailsPrice.textContent = '₹' + price;
+            detailsOldPrice.textContent = '₹' + oldPrice;
+            detailsSave.textContent = 'Save ₹' + save + ' - Limited Time';
+
+            const downloadBtn = document.getElementById('download-brochure-btn');
+            if (courseName === 'Full Stack Development') {
+                downloadBtn.href = 'fullstack-brochure.pdf';
+                downloadBtn.download = 'FullStack_Brochure.pdf';
+            } else if (courseName === 'Data Science with AI/ML') {
+                downloadBtn.href = 'data-analytics-brochure.pdf';
+                downloadBtn.download = 'DataScience_Brochure.pdf';
+            } else if (courseName === 'UI/UX Design') {
+                downloadBtn.href = 'uiux-brochure.pdf';
+                downloadBtn.download = 'UIUX_Brochure.pdf';
+            } else {
+                downloadBtn.href = 'brochure.pdf';
+                downloadBtn.download = 'TechU_Brochure.pdf';
+            }
+
+            detailsSection.classList.remove('hidden');
+            document.getElementById('enrollment-success').classList.add('hidden');
+            document.getElementById('ai-form').classList.add('hidden'); // hide AI form to focus on details
+            detailsSection.scrollIntoView({ behavior: 'smooth' });
+        };
+
+        // Open details view
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const courseName = e.target.getAttribute('data-course');
+                const price = e.target.getAttribute('data-price');
+                const oldPrice = e.target.getAttribute('data-old');
+                const save = e.target.getAttribute('data-save');
+
+                window.showCourseDetails(courseName, price, oldPrice, save);
+            });
+        });
+
+        // Direct Enroll button on Course Cards
+        document.querySelectorAll('.enroll-direct-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const courseName = e.target.getAttribute('data-course');
+                const price = e.target.getAttribute('data-price');
+                
+                showEnrollmentSuccess(courseName, price, "12 May", "Online Live");
+            });
+        });
+
+        // Enroll Now button on Pricing Card
+        document.getElementById('confirm-enroll-btn').addEventListener('click', () => {
+            const activeBatch = document.querySelector('.batch-box.active').getAttribute('data-batch');
+            const activeMode = document.querySelector('.mode-box.active').getAttribute('data-mode');
+            
+            showEnrollmentSuccess(currentSelectedCourse, currentSelectedPrice, activeBatch, activeMode);
+        });
+
+        // Function to handle enrollment success view
+        window.showEnrollmentSuccess = function(courseName, price, batch, mode) {
+            // Hide details if open
+            detailsSection.classList.add('hidden');
+            
+            // Populate success screen
+            document.getElementById('success-course-name').textContent = courseName;
+            document.getElementById('success-price').textContent = '₹' + price;
+            document.getElementById('success-batch').textContent = batch;
+            document.getElementById('success-mode').textContent = mode;
+            
+            // Show success screen
+            const successSection = document.getElementById('enrollment-success');
+            successSection.classList.remove('hidden');
+            successSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+    </script>
 </body>
 </html>

@@ -1,41 +1,53 @@
 import streamlit as st
-import requests
+import pandas as pd
+import os
 
-# Set n8n Webhook URL (Make sure your n8n workflow is active)
-N8N_WEBHOOK_URL = "http://localhost:5678/webhook/student-enroll"
+st.set_page_config(page_title="TechU Admin Dashboard", page_icon="📊", layout="wide")
 
-st.set_page_config(page_title="Course Enrollment Agent", page_icon="🎓", layout="centered")
+st.title("📊 TechU AI Enrollment - Admin Dashboard")
+st.write("Internal team dashboard for monitoring AI enrollments and lead metrics.")
 
-st.title("🎓 AI Course Enrollment Assistant")
-st.write("Fill out your details and our AI will recommend the perfect learning path for you.")
+# Security simple mock
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
 
-with st.form("enrollment_form"):
-    name = st.text_input("Full Name", placeholder="e.g., Rahul Sharma")
-    email = st.text_input("Email Address", placeholder="e.g., rahul@example.com")
-    skills = st.text_area("Current Skills", placeholder="e.g., Python, SQL, Communication")
-    career_goal = st.text_input("Career Goal", placeholder="e.g., Data Scientist")
-    gpa = st.number_input("GPA (out of 10.0)", min_value=0.0, max_value=10.0, value=7.5, step=0.1)
-    
-    submitted = st.form_submit_button("Get AI Recommendation")
-    
-    if submitted:
-        if not name or not email or not skills or not career_goal:
-            st.error("Please fill in all required fields.")
+if not st.session_state['authenticated']:
+    st.subheader("Admin Login")
+    password = st.text_input("Enter password", type="password")
+    if st.button("Login"):
+        if password == "admin123":
+            st.session_state['authenticated'] = True
+            st.rerun()
         else:
-            payload = {
-                "name": name,
-                "email": email,
-                "skills": skills,
-                "career_goal": career_goal,
-                "gpa": float(gpa)
-            }
+            st.error("Incorrect password")
+else:
+    st.sidebar.button("Logout", on_click=lambda: st.session_state.update({'authenticated': False}))
+    
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Leads", "142", "+12")
+    col2.metric("Enrolled", "86", "+5")
+    col3.metric("Conversion Rate", "60.5%", "+2.1%")
+    col4.metric("Avg Fit Score", "88", "+1")
+
+    st.subheader("Recent Applications (Mock Data / CSV)")
+    
+    csv_path = "raw_enrollment_data.csv"
+    if os.path.exists(csv_path):
+        try:
+            df = pd.read_csv(csv_path)
+            st.dataframe(df.tail(10))
             
-            with st.spinner("AI is analyzing your profile..."):
-                try:
-                    response = requests.post(N8N_WEBHOOK_URL, json=payload)
-                    if response.status_code == 200:
-                        st.success(f"Success! Your application has been submitted. Check your email for recommendations!")
-                    else:
-                        st.error(f"Failed to submit. Status code: {response.status_code}")
-                except Exception as e:
-                    st.error(f"Error connecting to n8n: {str(e)}")
+            st.subheader("Course Distribution")
+            if 'Recommendation Course' in df.columns:
+                st.bar_chart(df['Recommendation Course'].value_counts())
+        except:
+            st.warning("Could not read CSV data.")
+    else:
+        st.info("No raw_enrollment_data.csv found yet. Start sending webhooks!")
+        
+    st.subheader("Trigger Manual Sync")
+    if st.button("Refresh Power BI Dataset"):
+        with st.spinner("Calling Power BI API..."):
+            # Mock sync
+            import time; time.sleep(1)
+            st.success("Power BI Dataset Refresh Triggered Successfully!")

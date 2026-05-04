@@ -1,5 +1,5 @@
 {
-  "name": "Enrollment Management Agent",
+  "name": "AI Enrollment Agent - Full Pipeline",
   "nodes": [
     {
       "parameters": {
@@ -20,10 +20,10 @@
     },
     {
       "parameters": {
-        "functionCode": "const body = items[0].json.body || items[0].json;\nconst skills = body.skills;\nconst career_goal = body.career_goal;\n\nif (!skills || String(skills).trim() === '') {\n  throw new Error('Validation Error: skills field is required.');\n}\nif (!career_goal || String(career_goal).trim() === '') {\n  throw new Error('Validation Error: career_goal field is required.');\n}\n\nreturn [{\n  json: {\n    name: body.name || '',\n    email: body.email || '',\n    skills: String(skills),\n    career_goal: String(career_goal),\n    gpa: Number(body.gpa) || 0\n  }\n}];"
+        "functionCode": "const body = items[0].json.body || items[0].json;\nconst lead_id = 'LID-' + Math.floor(Math.random() * 1000000);\nreturn [{\n  json: {\n    lead_id: lead_id,\n    name: body.name || '',\n    email: body.email || '',\n    skills: body.skills || '',\n    career_goal: body.career_goal || '',\n    gpa: Number(body.gpa) || 0,\n    programming_exp: body.programming_exp || '',\n    time_commitment: body.time_commitment || '',\n    course_expectations: body.course_expectations || ''\n  }\n}];"
       },
       "id": "node-2",
-      "name": "Validate Input",
+      "name": "Validate & Prepare",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [
@@ -33,12 +33,32 @@
     },
     {
       "parameters": {
-        "functionCode": "const item = items[0].json;\nreturn [{\n  json: {\n    name: item.name,\n    email: item.email,\n    skills: item.skills,\n    career_goal: item.career_goal,\n    gpa: item.gpa,\n    profile: item.skills + ' ' + item.career_goal\n  }\n}];"
+        "method": "POST",
+        "url": "https://ai-enrollment-agent.onrender.com/recommend",
+        "sendBody": true,
+        "bodyType": "json",
+        "specifyBody": "keypair",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "skills",
+              "value": "={{ $json.skills }}"
+            },
+            {
+              "name": "career_goal",
+              "value": "={{ $json.career_goal }}"
+            },
+            {
+              "name": "gpa",
+              "value": "={{ $json.gpa }}"
+            }
+          ]
+        }
       },
-      "id": "node-3",
-      "name": "Transform Data",
-      "type": "n8n-nodes-base.function",
-      "typeVersion": 1,
+      "id": "node-4",
+      "name": "AI Model (Top 3)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
       "position": [
         680,
         300
@@ -46,50 +66,14 @@
     },
     {
       "parameters": {
-        "method": "POST",
-        "url": "http://localhost:5000/recommend",
-        "sendBody": true,
-        "bodyType": "json",
-        "specifyBody": "keypair",
-        "bodyParameters": {
-          "parameters": [
-            {
-              "name": "profile",
-              "value": "={{ $json.profile }}"
-            },
-            {
-              "name": "gpa",
-              "value": "={{ $json.gpa }}"
-            }
-          ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": false
-            }
-          }
-        }
+        "functionCode": "const aiData = items[0].json;\nlet recommendations = [];\n\nif (aiData.recommendations) {\n  recommendations = aiData.recommendations;\n} else if (aiData.recommended_course) {\n  recommendations = [{\n    course_name: aiData.recommended_course,\n    fit_score: aiData.fit_score,\n    fit_level: aiData.fit_level || (aiData.fit_score >= 80 ? 'High' : 'Medium')\n  }];\n}\n\nreturn [{\n  json: {\n    recommendations: recommendations\n  }\n}];"
       },
-      "id": "node-4",
-      "name": "AI Model API Call",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        900,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "functionCode": "const aiData = items[0].json;\nconst studentData = $node['Transform Data'].json;\n\nconst score = Number(aiData.fit_score) || 0;\nlet fit_level;\nif (score >= 80) {\n  fit_level = 'High';\n} else if (score >= 60) {\n  fit_level = 'Medium';\n} else {\n  fit_level = 'Low';\n}\n\nreturn [{\n  json: {\n    name: studentData.name,\n    email: studentData.email,\n    skills: studentData.skills,\n    career_goal: studentData.career_goal,\n    gpa: studentData.gpa,\n    recommended_course: aiData.recommended_course || 'General Course',\n    fit_score: score,\n    fit_level: fit_level\n  }\n}];"
-      },
-      "id": "node-5",
-      "name": "Fit Score Logic",
+      "id": "node-12",
+      "name": "Normalize AI Data",
       "type": "n8n-nodes-base.function",
       "typeVersion": 1,
       "position": [
-        1120,
+        900,
         300
       ]
     },
@@ -98,91 +82,184 @@
         "operation": "append",
         "documentId": {
           "__rl": true,
-          "value": "YOUR_GOOGLE_SHEET_ID",
+          "value": "1_lJPvOD5ZRJGWWS9M7jKMGfMmdEkt7S6iIaBg-t6G4E",
           "mode": "id"
         },
         "sheetName": {
           "__rl": true,
-          "value": "Enrollments",
+          "value": "Sheet1",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead ID": "={{ $json.lead_id }}",
+            "Timestamp": "={{ new Date().toISOString() }}",
+            "Name": "={{ $node[\"Student Enrollment Trigger\"].json.body.name }}",
+            "Email": "={{ $node[\"Student Enrollment Trigger\"].json.body.email }}",
+            "Phone": "={{ $node[\"Student Enrollment Trigger\"].json.body.phone }}",
+            "Location": "={{ $node[\"Student Enrollment Trigger\"].json.body.location }}",
+            "Education": "={{ $node[\"Student Enrollment Trigger\"].json.body.education }}",
+            "Skills": "={{ $node[\"Student Enrollment Trigger\"].json.body.skills }}",
+            "Career Goal": "={{ $node[\"Student Enrollment Trigger\"].json.body.career_goal }}",
+            "GPA": "={{ $node[\"Student Enrollment Trigger\"].json.body.gpa }}",
+            "Programming Experience": "={{ $node[\"Student Enrollment Trigger\"].json.body.programming_exp }}",
+            "Time Commitment": "={{ $node[\"Student Enrollment Trigger\"].json.body.time_commitment }}",
+            "Course Expectations": "={{ $node[\"Student Enrollment Trigger\"].json.body.course_expectations }}",
+            "Recommendation Course": "={{ $json.recommendations[0].course_name }}",
+            "Fit Score": "={{ $json.recommendations[0].fit_score }}",
+            "Fit Level": "={{ $json.recommendations[0].fit_level }}"
+          }
+        }
+      },
+      "id": "node-13",
+      "name": "Log Discovery Inquiry",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1120,
+        300
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "14",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Student Enrollment Trigger\"].json.body.email }}",
+        "subject": "Your AI Learning Path Recommendations",
+        "emailType": "text",
+        "message": "=Hello {{ $node[\"Student Enrollment Trigger\"].json.body.name }},\n\nOur AI has analyzed your profile and found these matches for you:\n\n{{ $node[\"Normalize AI Data\"].json.recommendations.map((c, i) => (i+1) + \". \" + c.course_name + \" (\" + c.fit_score + \"% Match)\\n   Why: \" + c.match_reason).join('\\n\\n') }}\n\nPlease return to the portal to select your preferred course. Your Lead ID is: {{ $node[\"Validate & Prepare\"].json.lead_id }}.\n\nBest regards,\nTechu AI Labs",
+        "options": {}
+      },
+      "id": "node-11",
+      "name": "Send Top 3 Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1340,
+        300
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "course-selection",
+        "responseMode": "onReceived",
+        "options": {}
+      },
+      "id": "node-10",
+      "name": "Course Selection Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        500
+      ],
+      "webhookId": "course-selection-001"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_lJPvOD5ZRJGWWS9M7jKMGfMmdEkt7S6iIaBg-t6G4E",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Sheet1",
           "mode": "name"
         },
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
             "Timestamp": "={{ new Date().toISOString() }}",
-            "Name": "={{ $json.name }}",
-            "Email": "={{ $json.email }}",
-            "Skills": "={{ $json.skills }}",
-            "Career Goal": "={{ $json.career_goal }}",
-            "GPA": "={{ $json.gpa }}",
-            "Recommended Course": "={{ $json.recommended_course }}",
-            "Fit Score": "={{ $json.fit_score }}",
-            "Fit Level": "={{ $json.fit_level }}"
+            "Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone }}",
+            "Location": "={{ $json.body.location }}",
+            "Education": "={{ $json.body.education }}",
+            "Skills": "={{ $json.body.skills }}",
+            "Career Goal": "={{ $json.body.career_goal }}",
+            "GPA": "={{ $json.body.gpa }}",
+            "Programming Experience": "={{ $json.body.programming_exp }}",
+            "Time Commitment": "={{ $json.body.time_commitment }}",
+            "Course Expectations": "={{ $json.body.course_expectations }}",
+            "Recommendation Course": "={{ $json.body.selected_course }}",
+            "Fit Score": "={{ $json.body.fit_score }}",
+            "Fit Level": "={{ $json.body.fit_level }}"
           }
-        },
-        "options": {
-          "valueInputMode": "USER_ENTERED"
         }
       },
       "id": "node-6",
-      "name": "Log to Google Sheets",
+      "name": "Track Enrollment Metric",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.5,
       "position": [
-        1340,
-        300
-      ]
+        460,
+        500
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "14",
+          "name": "Google Sheets account"
+        }
+      }
     },
     {
       "parameters": {
-        "sendTo": "={{ $json.email }}",
-        "subject": "Your Course Recommendation - Techu Innovations Labs",
+        "sendTo": "={{ $json.body.email }}",
+        "subject": "Congratulations! Enrollment Confirmed",
         "emailType": "text",
-        "message": "=Hello {{ $json.name }},\n\nThank you for registering with Techu Innovations Labs!\n\nBased on your profile, our AI has generated the following recommendation:\n\n  Recommended Course : {{ $json.recommended_course }}\n  Fit Score         : {{ $json.fit_score }} / 100\n  Fit Level         : {{ $json.fit_level }}\n\nWe believe this course is the perfect match for your skills and career goals.\n\nClick below to enroll:\nhttps://techu.in/enroll\n\nBest regards,\nTechu Innovations Labs\nMadhapur, Hyderabad",
+        "message": "=Hi {{ $json.body.name }},\n\nYou have successfully enrolled in the {{ $json.body.selected_course }} program!\n\nYour AI Fit Score: {{ $json.body.fit_score }}%\n\nOur student success team will contact you within 24 hours with your login credentials.\n\nWelcome aboard!\nTechu AI Labs",
         "options": {}
       },
       "id": "node-7",
-      "name": "Send Recommendation Email",
+      "name": "Confirmation Email",
       "type": "n8n-nodes-base.gmail",
       "typeVersion": 2.1,
       "position": [
-        1560,
-        300
-      ]
+        680,
+        500
+      ],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "6",
+          "name": "Gmail account"
+        }
+      }
     },
     {
       "parameters": {
         "method": "POST",
-        "url": "https://api.powerbi.com/v1.0/myorg/datasets/YOUR_DATASET_ID/refreshes",
+        "url": "https://api.powerbi.com/v1.0/myorg/datasets/862aa6a0-e7b5-4af4-b524-f9ecc436fbd8/refreshes",
         "sendHeaders": true,
         "headerParameters": {
           "parameters": [
             {
               "name": "Authorization",
               "value": "Bearer YOUR_POWERBI_TOKEN"
-            },
-            {
-              "name": "Content-Type",
-              "value": "application/json"
             }
           ]
-        },
-        "options": {
-          "response": {
-            "response": {
-              "fullResponse": false
-            }
-          },
-          "allowUnauthorizedCerts": true
         }
       },
       "id": "node-8",
-      "name": "Trigger Power BI Refresh",
+      "name": "Refresh Power BI",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
       "position": [
-        1780,
-        300
+        900,
+        500
       ]
     }
   ],
@@ -191,99 +268,94 @@
       "main": [
         [
           {
-            "node": "Validate Input",
+            "node": "Validate & Prepare",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Validate Input": {
+    "Validate & Prepare": {
       "main": [
         [
           {
-            "node": "Transform Data",
+            "node": "AI Model (Top 3)",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Transform Data": {
+    "AI Model (Top 3)": {
       "main": [
         [
           {
-            "node": "AI Model API Call",
+            "node": "Normalize AI Data",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "AI Model API Call": {
+    "Normalize AI Data": {
       "main": [
         [
           {
-            "node": "Fit Score Logic",
+            "node": "Log Discovery Inquiry",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Fit Score Logic": {
+    "Log Discovery Inquiry": {
       "main": [
         [
           {
-            "node": "Log to Google Sheets",
+            "node": "Send Top 3 Email",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Log to Google Sheets": {
+    "Send Top 3 Email": {
+      "main": [
+        []
+      ]
+    },
+    "Course Selection Trigger": {
       "main": [
         [
           {
-            "node": "Send Recommendation Email",
+            "node": "Track Enrollment Metric",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Send Recommendation Email": {
+    "Track Enrollment Metric": {
       "main": [
         [
           {
-            "node": "Trigger Power BI Refresh",
+            "node": "Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Confirmation Email": {
+      "main": [
+        [
+          {
+            "node": "Refresh Power BI",
             "type": "main",
             "index": 0
           }
         ]
       ]
     }
-  },
-  "pinData": {},
-  "settings": {
-    "executionOrder": "v1",
-    "saveManualExecutions": true,
-    "callerPolicy": "workflowsFromSameOwner",
-    "errorWorkflow": ""
-  },
-  "staticData": null,
-  "tags": [
-    {
-      "name": "Student Success"
-    },
-    {
-      "name": "AI Agent"
-    },
-    {
-      "name": "Enrollment"
-    }
-  ],
-  "triggerCount": 1,
-  "versionId": "v3-enrollment-agent"
+  }
 }
