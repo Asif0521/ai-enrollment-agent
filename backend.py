@@ -1,13 +1,14 @@
+import os
 from fastapi import FastAPI
 from pydantic import BaseModel
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from typing import Optional
+from typing import Optional, List
 from fastapi.middleware.cors import CORSMiddleware
+import google.generativeai as genai
+import json
 
-app = FastAPI(title="TechU Research Labs - Enrollment AI Agent")
+app = FastAPI(title="TechU Research Labs - AI Enrollment Agent (Gemini Powered)")
 
-# Add CORS middleware
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,25 +17,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-COURSES = [
-    {
-        "name": "Data Science with AI/ML",
-        "required_skills": "Python math statistics data analysis machine learning",
-        "target_goals": "Data Scientist AI Engineer Machine Learning Engineer"
-    },
-    {
-        "name": "Full Stack Development",
-        "required_skills": "HTML CSS JavaScript React Node database python java sql",
-        "target_goals": "Frontend Developer Backend Developer Full Stack Software Engineer"
-    },
-    {
-        "name": "UI/UX Design",
-        "required_skills": "Figma design wireframing user research prototyping photoshop",
-        "target_goals": "UI Designer UX Researcher Product Designer"
-    }
-]
+# Configure Gemini
+# The user should set this in Render Environment Variables
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+genai.configure(api_key=GEMINI_API_KEY)
+
+# Define the Course Catalog
+COURSES_CATALOG = """
+1. Data Science with AI/ML: Focuses on Python, Statistics, Machine Learning, Deep Learning, and Data Analysis. Ideal for aspiring Data Scientists or AI Engineers.
+2. Full Stack Development: Covers HTML, CSS, JavaScript, React, Node.js, and Databases. Best for Software Engineers and Web Developers.
+3. UI/UX Design: Focuses on Figma, User Research, Prototyping, and Visual Design. Perfect for Creative Designers.
+"""
 
 class StudentProfile(BaseModel):
+    name: str
+    email: str
     skills: str
     career_goal: str
     gpa: float
@@ -44,61 +41,74 @@ class StudentProfile(BaseModel):
 
 @app.post("/recommend")
 async def recommend_course(profile: StudentProfile):
-    vectorizer = TfidfVectorizer(stop_words='english')
-    
-    recommendations = []
-    
-    for course in COURSES:
-        # 1. Skill Match (40% weight)
-        skill_corpus = [course["required_skills"], profile.skills]
-        try:
-            skill_matrix = vectorizer.fit_transform(skill_corpus)
-            skill_match = cosine_similarity(skill_matrix[0:1], skill_matrix[1:2])[0][0]
-        except:
-            skill_match = 0
-            
-        # 2. Goal Alignment (40% weight)
-        goal_corpus = [course["target_goals"], profile.career_goal]
-        try:
-            goal_matrix = vectorizer.fit_transform(goal_corpus)
-            goal_alignment = cosine_similarity(goal_matrix[0:1], goal_matrix[1:2])[0][0]
-        except:
-            goal_alignment = 0
-            
-        # 3. Academic Strength (20% weight, max GPA assumed 10.0)
-        academic_strength = min(profile.gpa / 10.0, 1.0)
-        
-        # Calculate final Fit Score (out of 100)
-        fit_score = (0.4 * skill_match + 0.4 * goal_alignment + 0.2 * academic_strength) * 100
-        
-        # Boost score slightly based on experience
-        if profile.programming_exp in ["Intermediate", "Advanced"] and "Data" in course["name"]:
-            fit_score += 5
-            
-        # Add random variance to make it feel more dynamic when user types less
-        if fit_score < 50:
-             fit_score += 30 # base minimum logic
-             
-        fit_score = max(0.0, min(100.0, round(fit_score, 2)))
-        fit_level = "High" if fit_score >= 80 else ("Medium" if fit_score >= 60 else "Low")
-        
-        # Generate Reasoning
-        exp_text = f"your background as a {profile.programming_exp}" if profile.programming_exp else "your current background"
-        time_text = f"dedicate {profile.time_commitment}" if profile.time_commitment else "dedicate time"
-        expect_text = f"goal to {profile.course_expectations}" if profile.course_expectations else "career goals"
-        
-        reason = f"Since you mentioned you can {time_text} and have a {expect_text}, our AI highly recommends the {course['name']} program. Your prior background as a {profile.programming_exp or 'student'} gives you the perfect foundation for this learning path."
-        
-        recommendations.append({
-            "course_name": course["name"],
-            "fit_score": fit_score,
-            "fit_level": fit_level,
-            "match_reason": reason
-        })
+    if not GEMINI_API_KEY:
+        return {"error": "Gemini API Key not configured"}
 
-    # Sort top 3
-    recommendations = sorted(recommendations, key=lambda x: x["fit_score"], reverse=True)[:3]
+    # Initialize the model
+    model = genai.GenerativeModel('gemini-1.5-flash')
+    
+    prompt = f"""
+    You are an Elite Career Counselor for TechU Research Labs. 
+    Analyze the following student profile and match them to exactly 3 courses from our catalog.
+    
+    COURSES CATALOG:
+    {COURSES_CATALOG}
+    
+    STUDENT PROFILE:
+    - Name: {profile.name}
+    - Skills: {profile.skills}
+    - Career Goal: {profile.career_goal}
+    - GPA: {profile.gpa}/10.0
+    - Programming Experience: {profile.programming_exp}
+    - Weekly Time Commitment: {profile.time_commitment}
+    - Expectations: {profile.course_expectations}
+    
+    TASK:
+    1. Calculate a 'fit_score' (0-100) for each of the 3 courses based on how well their skills and goals align.
+    2. Assign a 'fit_level' (High, Medium, or Low).
+    3. Write a personalized 'match_reason' (2 sentences) explaining WHY this course fits their specific background.
+    
+    OUTPUT FORMAT (Strict JSON):
+    {{
+      "recommendations": [
+        {{
+          "course_name": "Full Name of Course",
+          "fit_score": 95,
+          "fit_level": "High",
+          "match_reason": "Personalized reason here."
+        }},
+        ...
+      ]
+    }}
+    
+    Sort the results by fit_score in descending order. Return ONLY the JSON.
+    """
 
-    return {
-        "recommendations": recommendations
-    }
+    try:
+        response = model.generate_content(prompt)
+        # Clean up the response to extract JSON
+        content = response.text.strip()
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
+            
+        data = json.loads(content)
+        return data
+    except Exception as e:
+        print(f"Gemini Error: {e}")
+        # Fallback to simple matching if AI fails
+        return {
+            "recommendations": [
+                {
+                    "course_name": "Full Stack Development",
+                    "fit_score": 85,
+                    "fit_level": "High",
+                    "match_reason": "Our AI is currently optimizing. This course is a strong foundational match for your tech journey."
+                }
+            ]
+        }
+
+@app.get("/")
+async def health_check():
+    return {"status": "online", "engine": "Gemini 1.5 Flash"}

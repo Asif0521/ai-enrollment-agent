@@ -1,6 +1,5 @@
 fastapi
 uvicorn
 pydantic
-scikit-learn
-pandas
+google-generativeai
 python-multipart
