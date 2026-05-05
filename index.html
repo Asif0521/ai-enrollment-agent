@@ -51,11 +51,18 @@
                 </div>
             </div>
 
-            <!-- Right Side Image -->
+            <!-- Right Side Image Slideshow -->
             <div class="hero-image-wrapper">
-                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80" alt="Students learning">
-                <div class="hero-floating-badge">
-                    <span class="live-tag"><i class="ph-fill ph-broadcast"></i> LIVE</span> Register for <span style="color:var(--accent-magenta);">Free Demo</span>
+                <img class="hero-slide active" src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80" alt="Team collaborating on code">
+                <img class="hero-slide" src="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80" alt="Developer working on laptop">
+                <img class="hero-slide" src="https://images.unsplash.com/photo-1573164713988-8665fc963095?auto=format&fit=crop&w=1000&q=80" alt="Data Science workspace">
+                <img class="hero-slide" src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1000&q=80" alt="Tech innovation lab">
+                <!-- Slide Indicators -->
+                <div class="hero-slide-indicators">
+                    <span class="indicator active" data-slide="0"></span>
+                    <span class="indicator" data-slide="1"></span>
+                    <span class="indicator" data-slide="2"></span>
+                    <span class="indicator" data-slide="3"></span>
                 </div>
             </div>
         </div>
@@ -579,6 +586,34 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="script.js"></script>
     <script>
+        // Hero Image Slideshow
+        (function() {
+            const slides = document.querySelectorAll('.hero-slide');
+            const indicators = document.querySelectorAll('.hero-slide-indicators .indicator');
+            let current = 0;
+            const total = slides.length;
+
+            function goToSlide(index) {
+                slides[current].classList.remove('active');
+                indicators[current].classList.remove('active');
+                current = index;
+                slides[current].classList.add('active');
+                indicators[current].classList.add('active');
+            }
+
+            // Auto-rotate every 4 seconds
+            setInterval(() => {
+                goToSlide((current + 1) % total);
+            }, 4000);
+
+            // Click on indicators
+            indicators.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    goToSlide(parseInt(dot.dataset.slide));
+                });
+            });
+        })();
+
         // Tab switching
         document.querySelectorAll('.arrow-tab').forEach(tab => {
             tab.addEventListener('click', (e) => {
