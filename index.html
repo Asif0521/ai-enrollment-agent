@@ -708,21 +708,25 @@
                 phone: document.getElementById('modal-phone').value,
                 selected_course: document.getElementById('modal-course').value,
                 work_experience: document.getElementById('modal-experience').value,
-                batch: document.querySelector('.batch-box.active').getAttribute('data-batch'),
-                mode: document.querySelector('.mode-box.active').getAttribute('data-mode'),
-                // Carry over other parameters if they exist in the main form
-                skills: document.getElementById('skills').value,
-                gpa: document.getElementById('gpa').value,
-                education: document.getElementById('education').value
+                batch: document.querySelector('.batch-box.active')?.getAttribute('data-batch') || "Not Selected",
+                mode: document.querySelector('.mode-box.active')?.getAttribute('data-mode') || "Not Selected"
             };
 
             try {
-                // Send to n8n
-                await fetch(SELECTION_WEBHOOK_URL, {
+                // 1. Send to Backend Database (/enroll)
+                const baseUrl = BACKEND_URL.replace('/recommend', '');
+                await fetch(`${baseUrl}/enroll`, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(modalData)
                 });
+
+                // 2. Send to n8n (Optional Sync)
+                fetch(SELECTION_WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(modalData)
+                }).catch(e => console.warn("n8n Logging failed", e));
 
                 document.getElementById('enrollmentModal').style.display = "none";
                 showEnrollmentSuccess(modalData.selected_course, currentSelectedPrice, modalData.batch, modalData.mode);

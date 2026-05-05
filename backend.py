@@ -40,6 +40,29 @@ class StudentProfile(BaseModel):
     time_commitment: Optional[str] = ""
     course_expectations: Optional[str] = ""
 
+class EnrollmentRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    selected_course: str
+    work_experience: str
+    batch: Optional[str] = "Not Selected"
+    mode: Optional[str] = "Not Selected"
+
+@app.post("/enroll")
+async def enroll_student(enrollment: EnrollmentRequest):
+    # This is where you would normally save to your Database (e.g. PostgreSQL, MySQL)
+    # Example SQL (using psycopg2 or sqlalchemy):
+    # cursor.execute("INSERT INTO enrollments (name, email, phone, course, experience) VALUES (%s, %s, %s, %s, %s)", ...)
+    
+    print(f"New Enrollment Received: {enrollment.name} for {enrollment.selected_course}")
+    
+    return {
+        "status": "success",
+        "message": f"Successfully enrolled {enrollment.name} in {enrollment.selected_course}",
+        "received_data": enrollment
+    }
+
 @app.post("/recommend")
 async def recommend_course(profile: StudentProfile):
     if not GEMINI_API_KEY:
