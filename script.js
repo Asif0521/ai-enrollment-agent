@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const card = document.createElement('div');
         card.className = 'course-card';
         card.style.border = '1px dashed var(--accent-magenta)';
-        card.style.background = 'rgba(166, 43, 121, 0.02)';
+        card.style.background = 'rgba(79, 70, 229, 0.02)';
         
         card.innerHTML = `
             <div class="card-badge" style="background: var(--text-primary);">External Track</div>
