@@ -111,6 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.classList.add('hidden');
                 resultCard.classList.remove('hidden');
 
+                // Unlock Enrollment across the site
+                const confirmBtn = document.getElementById('confirm-enroll-btn');
+                const lockBtn = document.getElementById('lock-enroll-btn');
+                if (confirmBtn) confirmBtn.classList.remove('hidden');
+                if (lockBtn) lockBtn.classList.add('hidden');
+
                 // Render Top 3 Cards
                 const recommendationsList = document.getElementById('recommendationsList');
                 recommendationsList.innerHTML = '';
