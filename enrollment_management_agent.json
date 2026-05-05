@@ -41,16 +41,36 @@
         "bodyParameters": {
           "parameters": [
             {
+              "name": "name",
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.name }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.email }}"
+            },
+            {
               "name": "skills",
-              "value": "={{ $json.skills }}"
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.skills }}"
             },
             {
               "name": "career_goal",
-              "value": "={{ $json.career_goal }}"
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.career_goal }}"
             },
             {
               "name": "gpa",
-              "value": "={{ $json.gpa }}"
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.gpa }}"
+            },
+            {
+              "name": "programming_exp",
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.programming_exp }}"
+            },
+            {
+              "name": "time_commitment",
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.time_commitment }}"
+            },
+            {
+              "name": "course_expectations",
+              "value": "={{ $node[\"Student Enrollment Trigger\"].json.body.course_expectations }}"
             }
           ]
         }

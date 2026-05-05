@@ -56,6 +56,7 @@ async def recommend_course(profile: StudentProfile):
     
     STUDENT PROFILE:
     - Name: {profile.name}
+    - Education Level: {profile.education}
     - Skills: {profile.skills}
     - Career Goal: {profile.career_goal}
     - GPA: {profile.gpa}/10.0
@@ -63,10 +64,16 @@ async def recommend_course(profile: StudentProfile):
     - Weekly Time Commitment: {profile.time_commitment}
     - Expectations: {profile.course_expectations}
     
+    CRITICAL SCORING REQUIREMENTS:
+    1. SKILLS MATCH (40% weight): If their skills (e.g., Python) match a course curriculum, the fit_score must be high.
+    2. PROFESSIONAL CONTEXT (30% weight): If the user is a "Working Professional" (Education Level), recommend advanced tracks or paths that respect their industry experience.
+    3. GOAL ALIGNMENT (20% weight): Match their Career Goal to the most relevant industry outcome.
+    4. ACADEMIC/COMMITMENT (10% weight): Factor in GPA and Time Commitment for feasibility.
+    
     TASK:
-    1. Calculate a 'fit_score' (0-100) for each of the 3 courses based on how well their skills and goals align.
-    2. Assign a 'fit_level' (High, Medium, or Low).
-    3. Write a personalized 'match_reason' (2 sentences) explaining WHY this course fits their specific background.
+    - Calculate a 'fit_score' (0-100) based on the above weights.
+    - Assign a 'fit_level' (High, Medium, or Low).
+    - Write a personalized 'match_reason' (2-3 sentences) explaining specifically how their {profile.skills} and {profile.education} status make them a candidate for this course.
     
     OUTPUT FORMAT (Strict JSON):
     {{
@@ -75,13 +82,13 @@ async def recommend_course(profile: StudentProfile):
           "course_name": "Full Name of Course",
           "fit_score": 95,
           "fit_level": "High",
-          "match_reason": "Personalized reason here."
+          "match_reason": "Specific personalized reason here."
         }},
         ...
       ]
     }}
     
-    Sort the results by fit_score in descending order. Return ONLY the JSON.
+    Sort by fit_score descending. Return ONLY the JSON.
     """
 
     try:

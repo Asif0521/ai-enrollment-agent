@@ -1,4 +1,5 @@
-// Production n8n Webhook URLs
+// Production URLs
+const BACKEND_URL = "https://ai-enrollment-agent.onrender.com/recommend";
 const WEBHOOK_URL = "https://n8nds.duckdns.org/webhook/student-enroll";
 const SELECTION_WEBHOOK_URL = "https://n8nds.duckdns.org/webhook/course-selection";
 
@@ -40,11 +41,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // UI Loading State
             submitBtn.disabled = true;
-            btnText.textContent = "Analyzing Profile...";
+            btnText.textContent = "AI is Analyzing Profile...";
             loader.style.display = "block";
 
             try {
-                const response = await fetch(WEBHOOK_URL, {
+                // 1. Get High-Accuracy Prediction from Render Backend (Direct Gemini Call)
+                const response = await fetch(BACKEND_URL, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json"
@@ -55,31 +57,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 let data;
                 if (response.ok) {
                     data = await response.json();
+                    
+                    // 2. Sync to n8n in background (for Google Sheets/Email)
+                    fetch(WEBHOOK_URL, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ ...payload, recommendations: data.recommendations })
+                    }).catch(e => console.warn("n8n Logging failed", e));
+                    
                 } else {
-                    console.warn(`Webhook failed. Calculating smart local recommendation.`);
+                    console.warn(`Backend failed. Calculating smart local recommendation.`);
                     const goal = payload.career_goal.toLowerCase();
                     const skills = payload.skills.toLowerCase();
                     
                     const localResults = [
-                        { name: "Full Stack Development", keywords: ["web", "full stack", "frontend", "backend", "react", "node", "javascript", "html", "css"], score: 65 },
-                        { name: "Data Science with AI/ML", keywords: ["data", "science", "ai", "ml", "machine learning", "python", "sql", "analysis", "statistics"], score: 65 },
-                        { name: "UI/UX Design", keywords: ["design", "ui", "ux", "figma", "user", "interface", "experience", "branding"], score: 65 }
+                        { name: "Full Stack Development", keywords: ["web", "full stack", "frontend", "backend", "react", "node", "javascript", "html", "css"], score: 40 },
+                        { name: "Data Science with AI/ML", keywords: ["data", "science", "ai", "ml", "machine learning", "python", "sql", "analysis", "statistics"], score: 40 },
+                        { name: "UI/UX Design", keywords: ["design", "ui", "ux", "figma", "user", "interface", "experience", "branding"], score: 40 }
                     ];
 
                     localResults.forEach(res => {
                         res.keywords.forEach(kw => {
-                            if (goal.includes(kw)) res.score += 15;
-                            if (skills.includes(kw)) res.score += 5;
+                            if (goal.includes(kw)) res.score += 20;
+                            if (skills.includes(kw)) res.score += 10;
                         });
-                        res.score = Math.min(98, res.score);
+                        res.score = Math.min(95, res.score);
                     });
 
                     data = {
                         recommendations: localResults.sort((a,b) => b.score - a.score).map(res => ({
                             course_name: res.name,
                             fit_score: res.score,
-                            fit_level: res.score >= 85 ? "High" : (res.score >= 70 ? "Medium" : "Low"),
-                            match_reason: `Based on your interest in ${payload.career_goal}, this program is a great fit for your goals.`
+                            fit_level: res.score >= 80 ? "High" : (res.score >= 60 ? "Medium" : "Low"),
+                            match_reason: `Based on your profile, ${res.name} aligns with your career path.`
                         }))
                     };
                 }
