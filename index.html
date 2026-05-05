@@ -366,12 +366,27 @@
                         <i class="ph-bold ph-briefcase input-icon"></i>
                         <select id="career_goal" required class="custom-select">
                             <option value="" disabled selected>Select your career goal</option>
-                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Software Engineer">Software Engineer</option>
+                            <option value="Frontend Developer">Frontend Developer</option>
+                            <option value="Backend Developer">Backend Developer</option>
                             <option value="Full Stack Developer">Full Stack Developer</option>
-                            <option value="UI/UX Designer">UI/UX Designer</option>
+                            <option value="Mobile App Developer">Mobile App Developer (iOS/Android)</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Data Analyst">Data Analyst</option>
+                            <option value="Data Engineer">Data Engineer</option>
                             <option value="AI/ML Engineer">AI/ML Engineer</option>
+                            <option value="DevOps Engineer">DevOps Engineer / SRE</option>
+                            <option value="Cloud Architect">Cloud Architect</option>
+                            <option value="Cybersecurity Analyst">Cybersecurity Analyst</option>
                             <option value="Product Manager">Product Manager</option>
-                            <option value="AI Engineer">AI Engineer</option>
+                            <option value="UI/UX Designer">UI/UX Designer</option>
+                            <option value="QA Engineer">QA Engineer / SDET</option>
+                            <option value="Blockchain Developer">Blockchain Developer</option>
+                            <option value="Game Developer">Game Developer</option>
+                            <option value="Database Administrator">Database Administrator (DBA)</option>
+                            <option value="Salesforce Developer">Salesforce Developer</option>
+                            <option value="Embedded Systems Engineer">Embedded Systems Engineer</option>
+                            <option value="Network Engineer">Network Engineer</option>
                             <option value="Other">Other / Not Listed</option>
                         </select>
                     </div>
@@ -457,6 +472,14 @@
 
                 <div id="recommendationsList" class="recommendations-grid">
                     <!-- Dynamic Course Cards will be injected here via script.js -->
+                </div>
+
+                <div id="externalSuggestionsSection" class="hidden" style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border-subtle);">
+                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1.5rem; color: var(--text-primary); text-align: center;">Recommended External Pathways</h3>
+                    <p style="color: var(--text-secondary); text-align: center; margin-bottom: 2rem;">Specialized tracks matching your unique skills and goals.</p>
+                    <div id="externalList" class="recommendations-grid">
+                        <!-- External suggestions injected here -->
+                    </div>
                 </div>
 
                 <div class="selection-footer" style="text-align: center; margin-top: 2rem;">

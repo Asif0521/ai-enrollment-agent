@@ -146,6 +146,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     recommendationsList.appendChild(card);
                 });
 
+                // Render External Suggestions if they exist
+                const externalSection = document.getElementById('externalSuggestionsSection');
+                const externalList = document.getElementById('externalList');
+                
+                if (data.external_suggestions && data.external_suggestions.length > 0) {
+                    externalSection.classList.remove('hidden');
+                    externalList.innerHTML = '';
+                    
+                    data.external_suggestions.forEach((item, index) => {
+                        const card = document.createElement('div');
+                        card.className = 'course-card';
+                        card.style.border = '1px dashed var(--accent-magenta)';
+                        card.style.background = 'rgba(166, 43, 121, 0.02)';
+                        
+                        card.innerHTML = `
+                            <div class="card-badge" style="background: var(--text-primary);">External Track</div>
+                            <h4>${item.course_name}</h4>
+                            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-magenta); margin-bottom: 0.5rem;">
+                                <i class="ph-bold ph-globe"></i> ${item.platform}
+                            </div>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
+                                ${item.reason}
+                            </p>
+                            <button class="btn btn-outline-magenta" style="width: 100%; font-size: 0.85rem;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent('${item.course_name} ' + '${item.platform}'), '_blank')">
+                                Search Course <i class="ph-bold ph-arrow-square-out"></i>
+                            </button>
+                        `;
+                        externalList.appendChild(card);
+                    });
+                } else {
+                    externalSection.classList.add('hidden');
+                }
+
             } catch (error) {
                 console.error("Network Error:", error);
                 alert("Could not reach the AI Agent (Server offline). Displaying offline preview.");

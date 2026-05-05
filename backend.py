@@ -32,6 +32,7 @@ COURSES_CATALOG = """
 class StudentProfile(BaseModel):
     name: str
     email: str
+    education: str
     skills: str
     career_goal: str
     gpa: float
@@ -49,9 +50,11 @@ async def recommend_course(profile: StudentProfile):
     
     prompt = f"""
     You are an Elite Career Counselor for TechU Research Labs. 
-    Analyze the following student profile and match them to exactly 3 courses from our catalog.
-    
-    COURSES CATALOG:
+    Analyze the following student profile and perform two tasks:
+    1. Match them to exactly 3 courses from our INTERNAL CATALOG.
+    2. Suggest exactly 2 EXTERNAL COURSES (not from our catalog) if their skills or goals would benefit from specialized learning elsewhere (e.g., Coursera, Udemy, or industry certifications).
+
+    INTERNAL COURSES CATALOG:
     {COURSES_CATALOG}
     
     STUDENT PROFILE:
@@ -64,17 +67,16 @@ async def recommend_course(profile: StudentProfile):
     - Weekly Time Commitment: {profile.time_commitment}
     - Expectations: {profile.course_expectations}
     
-    CRITICAL SCORING REQUIREMENTS:
-    1. SKILLS MATCH (40% weight): If their skills (e.g., Python) match a course curriculum, the fit_score must be high.
-    2. PROFESSIONAL CONTEXT (30% weight): If the user is a "Working Professional" (Education Level), recommend advanced tracks or paths that respect their industry experience.
-    3. GOAL ALIGNMENT (20% weight): Match their Career Goal to the most relevant industry outcome.
-    4. ACADEMIC/COMMITMENT (10% weight): Factor in GPA and Time Commitment for feasibility.
-    
-    TASK:
-    - Calculate a 'fit_score' (0-100) based on the above weights.
-    - Assign a 'fit_level' (High, Medium, or Low).
-    - Write a personalized 'match_reason' (2-3 sentences) explaining specifically how their {profile.skills} and {profile.education} status make them a candidate for this course.
-    
+    SCORING REQUIREMENTS (for Internal Catalog):
+    - SKILLS MATCH (40% weight): Match curriculum to {profile.skills}.
+    - PROFESSIONAL CONTEXT (30% weight): Tailor for {profile.education} background.
+    - GOAL ALIGNMENT (20% weight): Align with {profile.career_goal}.
+    - FEASIBILITY (10% weight): Consider GPA/Time.
+
+    EXTERNAL SUGGESTIONS CRITERIA:
+    - Identify advanced or niche skills in {profile.skills} or {profile.career_goal} not covered by internal courses.
+    - Suggest specific external paths (e.g. "Google Cloud Architect Professional" or "AWS Certified Developer").
+
     OUTPUT FORMAT (Strict JSON):
     {{
       "recommendations": [
@@ -82,13 +84,19 @@ async def recommend_course(profile: StudentProfile):
           "course_name": "Full Name of Course",
           "fit_score": 95,
           "fit_level": "High",
-          "match_reason": "Specific personalized reason here."
-        }},
-        ...
+          "match_reason": "Personalized explanation here."
+        }}
+      ],
+      "external_suggestions": [
+        {{
+          "course_name": "External Course/Cert Name",
+          "platform": "e.g., Coursera / Certification Board",
+          "reason": "Why this matches their specialized skills/goals."
+        }}
       ]
     }}
     
-    Sort by fit_score descending. Return ONLY the JSON.
+    Sort internal recommendations by fit_score descending. Return ONLY the JSON.
     """
 
     try:
