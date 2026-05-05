@@ -88,7 +88,7 @@
                         <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-orange" onclick="document.getElementById('ai-form').scrollIntoView({behavior:'smooth'})">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
+                        <button class="btn btn-orange" onclick="scrollToAIForm()">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
                         <button class="btn btn-outline-magenta view-details-btn" data-course="Full Stack Development" data-price="99,000" data-old="1,40,000" data-save="41,000">Course Details</button>
                     </div>
                 </div>
@@ -110,7 +110,7 @@
                         <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-orange" onclick="document.getElementById('ai-form').scrollIntoView({behavior:'smooth'})">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
+                        <button class="btn btn-orange" onclick="scrollToAIForm()">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
                         <button class="btn btn-outline-magenta view-details-btn" data-course="Data Science with AI/ML" data-price="85,000" data-old="1,20,000" data-save="35,000">Course Details</button>
                     </div>
                 </div>
@@ -132,7 +132,7 @@
                         <div class="meta-item"><i class="ph-bold ph-chart-bar"></i> Beginner</div>
                     </div>
                     <div class="card-actions">
-                        <button class="btn btn-orange" onclick="document.getElementById('ai-form').scrollIntoView({behavior:'smooth'})">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
+                        <button class="btn btn-orange" onclick="scrollToAIForm()">Check AI Match <i class="ph-bold ph-sparkle"></i></button>
                         <button class="btn btn-outline-magenta view-details-btn" data-course="UI/UX Design" data-price="65,000" data-old="95,000" data-save="30,000">Course Details</button>
                     </div>
                 </div>
@@ -224,7 +224,7 @@
                 </div>
 
                 <button class="btn btn-orange enroll-full-btn hidden" id="confirm-enroll-btn">Enroll Now</button>
-                <button class="btn btn-outline-magenta enroll-full-btn" id="lock-enroll-btn" onclick="document.getElementById('ai-form').scrollIntoView({behavior:'smooth'})">
+                <button class="btn btn-outline-magenta enroll-full-btn" id="lock-enroll-btn" onclick="scrollToAIForm()">
                     <i class="ph-bold ph-lock"></i> Complete AI Match to Enroll
                 </button>
             </div>
@@ -608,6 +608,17 @@
         const detailsSave = document.getElementById('details-save');
         let currentSelectedCourse = "";
         let currentSelectedPrice = "";
+
+        window.scrollToAIForm = function() {
+            const aiForm = document.getElementById('ai-form');
+            aiForm.classList.remove('hidden'); // Ensure it's visible
+            
+            // Hide course details if it's open, to keep the focus on the questionnaire
+            const detailsSection = document.getElementById('course-details');
+            if (detailsSection) detailsSection.classList.add('hidden');
+            
+            aiForm.scrollIntoView({ behavior: 'smooth' });
+        };
 
         window.showCourseDetails = function(courseName, price, oldPrice, save) {
             currentSelectedCourse = courseName;
