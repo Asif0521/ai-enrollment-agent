@@ -1,22 +1,23 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 
-app = FastAPI(title="Enrollment AI Agent")
+app = FastAPI(title="TechU Research Labs - Enrollment AI Agent")
 
 # Enable CORS for the Vercel frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # Change to your Vercel URL in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Sample Course Dataset
+# Course Dataset
 COURSES = [
     {
         "name": "Data Science & AI",
@@ -40,6 +41,30 @@ COURSES = [
     }
 ]
 
+# External suggestions mapping by career goal keywords
+EXTERNAL_MAP = {
+    "cloud": [
+        {"course_name": "Google Cloud Professional Architect", "platform": "Google Cloud", "reason": "Industry-standard certification for cloud architecture roles."},
+        {"course_name": "AWS Certified Solutions Architect", "platform": "Amazon AWS", "reason": "Most in-demand cloud certification globally."}
+    ],
+    "data": [
+        {"course_name": "IBM Data Science Professional Certificate", "platform": "Coursera", "reason": "Comprehensive data science track from IBM covering Python, SQL, and ML."},
+        {"course_name": "TensorFlow Developer Certificate", "platform": "Google / Coursera", "reason": "Validates deep learning expertise with TensorFlow."}
+    ],
+    "security": [
+        {"course_name": "CompTIA Security+", "platform": "CompTIA", "reason": "Globally recognized entry-level cybersecurity certification."},
+        {"course_name": "Certified Ethical Hacker (CEH)", "platform": "EC-Council", "reason": "Essential for penetration testing and security analyst roles."}
+    ],
+    "devops": [
+        {"course_name": "Docker & Kubernetes: The Complete Guide", "platform": "Udemy", "reason": "Hands-on container orchestration skills for DevOps pipelines."},
+        {"course_name": "HashiCorp Terraform Associate", "platform": "HashiCorp", "reason": "Infrastructure-as-code certification for modern DevOps."}
+    ],
+    "default": [
+        {"course_name": "Google Project Management Certificate", "platform": "Coursera", "reason": "Enhances project management and leadership skills for any tech role."},
+        {"course_name": "Meta Front-End Developer Certificate", "platform": "Coursera", "reason": "Solid front-end foundation from Meta for career flexibility."}
+    ]
+}
+
 class StudentProfile(BaseModel):
     name: str
     email: str
@@ -47,9 +72,27 @@ class StudentProfile(BaseModel):
     career_goal: str
     education: str
     gpa: float
-    programming_exp: str
-    time_commitment: str
-    course_expectations: str
+    programming_exp: str = ""
+    time_commitment: str = ""
+    course_expectations: str = ""
+
+class EnrollmentRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    selected_course: str
+    work_experience: str
+    batch: Optional[str] = "Not Selected"
+    mode: Optional[str] = "Not Selected"
+
+@app.post("/enroll")
+async def enroll_student(enrollment: EnrollmentRequest):
+    print(f"New Enrollment Received: {enrollment.name} for {enrollment.selected_course}")
+    return {
+        "status": "success",
+        "message": f"Successfully enrolled {enrollment.name} in {enrollment.selected_course}",
+        "received_data": enrollment
+    }
 
 @app.post("/recommend")
 async def recommend_course(profile: StudentProfile):
@@ -77,8 +120,7 @@ async def recommend_course(profile: StudentProfile):
         # 3. Academic & Commitment (10% weight)
         academic_strength = min(profile.gpa / 10.0, 1.0)
         
-        # 4. Professional Context (30% weight - derived from multiplier and goal match)
-        # Professionals get a boost on courses matching their goal
+        # 4. Professional Context (30% weight)
         professional_weight = 0.3 if exp_multiplier > 1.0 and goal_alignment > 0.3 else 0.1
         
         # Calculate final Fit Score (out of 100)
@@ -93,7 +135,6 @@ async def recommend_course(profile: StudentProfile):
         else:
             fit_level = "Low"
             
-        # Personalized match reason fallback
         match_reason = f"Based on your {profile.skills} skills and goal as a {profile.career_goal}, this course is a solid match."
         if exp_multiplier > 1.1:
             match_reason = f"As a {profile.education}, your background in {profile.skills} makes this program an elite choice for your career pivot."
@@ -109,6 +150,19 @@ async def recommend_course(profile: StudentProfile):
     results.sort(key=lambda x: x["fit_score"], reverse=True)
     top_3 = results[:3]
 
+    # Determine external suggestions based on career goal
+    goal_lower = profile.career_goal.lower()
+    external = EXTERNAL_MAP.get("default")
+    for key in EXTERNAL_MAP:
+        if key in goal_lower or key in profile.skills.lower():
+            external = EXTERNAL_MAP[key]
+            break
+
     return {
-        "recommendations": top_3
+        "recommendations": top_3,
+        "external_suggestions": external
     }
+
+@app.get("/")
+async def health_check():
+    return {"status": "online", "engine": "TF-IDF Fallback + Gemini Primary"}
