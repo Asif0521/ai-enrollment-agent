@@ -118,66 +118,111 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (confirmBtn) confirmBtn.classList.remove('hidden');
                 if (lockBtn) lockBtn.classList.add('hidden');
 
-                // Render Top 3 Cards
+                // 1. Render Top 3 Matches (Internal)
                 const recommendationsList = document.getElementById('recommendationsList');
                 recommendationsList.innerHTML = '';
-
                 recommendations.forEach((item, index) => {
-                    const card = document.createElement('div');
-                    card.className = `course-card fit-${item.fit_level.toLowerCase()}`;
-                    card.style.animationDelay = `${index * 0.1}s`;
-                    
-                    card.innerHTML = `
-                        <div class="card-badge">${item.fit_level} Match</div>
-                        <h4>${item.course_name}</h4>
-                        <div class="fit-score-container">
-                            <div class="score-bar">
-                                <div class="score-fill" style="width: ${item.fit_score}%"></div>
-                            </div>
-                            <span class="score-text">${item.fit_score}% Fit</span>
-                        </div>
-                        <p class="match-reason" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
-                            ${item.match_reason || "Based on your profile, this course is a strong match."}
-                        </p>
-                        <button class="enroll-btn" onclick="enrollInCourse('${item.course_name}', ${item.fit_score})">
-                            View Course Details
-                        </button>
-                    `;
+                    const card = createCourseCard(item, item.fit_level, index);
                     recommendationsList.appendChild(card);
                 });
 
-                // Render External Suggestions if they exist
+                // 2. Render External Suggestions (Courses Not on Website)
                 const externalSection = document.getElementById('externalSuggestionsSection');
                 const externalList = document.getElementById('externalList');
                 
                 if (data.external_suggestions && data.external_suggestions.length > 0) {
                     externalSection.classList.remove('hidden');
                     externalList.innerHTML = '';
-                    
                     data.external_suggestions.forEach((item, index) => {
-                        const card = document.createElement('div');
-                        card.className = 'course-card';
-                        card.style.border = '1px dashed var(--accent-magenta)';
-                        card.style.background = 'rgba(166, 43, 121, 0.02)';
-                        
-                        card.innerHTML = `
-                            <div class="card-badge" style="background: var(--text-primary);">External Track</div>
-                            <h4>${item.course_name}</h4>
-                            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-magenta); margin-bottom: 0.5rem;">
-                                <i class="ph-bold ph-globe"></i> ${item.platform}
-                            </div>
-                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
-                                ${item.reason}
-                            </p>
-                            <button class="btn btn-outline-magenta" style="width: 100%; font-size: 0.85rem;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent('${item.course_name} ' + '${item.platform}'), '_blank')">
-                                Search Course <i class="ph-bold ph-arrow-square-out"></i>
-                            </button>
-                        `;
+                        const card = createExternalCard(item, index);
                         externalList.appendChild(card);
                     });
                 } else {
                     externalSection.classList.add('hidden');
                 }
+
+                // 3. Render Other Available Programs (Rest of the Catalog)
+                const otherSection = document.getElementById('otherCoursesSection');
+                const otherList = document.getElementById('otherCoursesList');
+                
+                const allInternalCourses = [
+                    "Full Stack Web Development",
+                    "Data Science & AI",
+                    "Cloud DevOps Engineering",
+                    "Cybersecurity Specialist"
+                ];
+
+                const recommendedNames = recommendations.map(r => r.course_name);
+                const otherCourses = allInternalCourses.filter(name => !recommendedNames.includes(name));
+
+                if (otherCourses.length > 0) {
+                    otherSection.classList.remove('hidden');
+                    otherList.innerHTML = '';
+                    otherCourses.forEach((courseName, index) => {
+                        const card = createCourseCard({ course_name: courseName, fit_score: 60, match_reason: "This program is also available in our current catalog." }, "Standard", index);
+                        otherList.appendChild(card);
+                    });
+                } else {
+                    otherSection.classList.add('hidden');
+                }
+
+            } catch (error) {
+                console.error("Network Error:", error);
+                alert("Could not reach the AI Agent (Server offline). Displaying offline preview.");
+                showOfflineResults();
+            } finally {
+                resetBtn();
+            }
+        });
+    }
+
+    // Helper to create internal course cards
+    function createCourseCard(item, fitLevel, index) {
+        const card = document.createElement('div');
+        card.className = `course-card fit-${fitLevel.toLowerCase()}`;
+        card.style.animationDelay = `${index * 0.1}s`;
+        
+        card.innerHTML = `
+            <div class="card-badge">${fitLevel} Match</div>
+            <h4>${item.course_name}</h4>
+            <div class="fit-score-container">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: ${item.fit_score}%"></div>
+                </div>
+                <span class="score-text">${item.fit_score}% Fit</span>
+            </div>
+            <p class="match-reason" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
+                ${item.match_reason}
+            </p>
+            <button class="enroll-btn" onclick="enrollInCourse('${item.course_name}', ${item.fit_score})">
+                View Course Details
+            </button>
+        `;
+        return card;
+    }
+
+    // Helper to create external course cards
+    function createExternalCard(item, index) {
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.style.border = '1px dashed var(--accent-magenta)';
+        card.style.background = 'rgba(166, 43, 121, 0.02)';
+        
+        card.innerHTML = `
+            <div class="card-badge" style="background: var(--text-primary);">External Track</div>
+            <h4>${item.course_name}</h4>
+            <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-magenta); margin-bottom: 0.5rem;">
+                <i class="ph-bold ph-globe"></i> ${item.platform}
+            </div>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
+                ${item.reason}
+            </p>
+            <button class="btn btn-outline-magenta" style="width: 100%; font-size: 0.85rem;" onclick="window.open('https://www.google.com/search?q=' + encodeURIComponent('${item.course_name} ' + '${item.platform}'), '_blank')">
+                Search Course <i class="ph-bold ph-arrow-square-out"></i>
+            </button>
+        `;
+        return card;
+    }
 
             } catch (error) {
                 console.error("Network Error:", error);
