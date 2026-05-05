@@ -41,8 +41,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // UI Loading State
             submitBtn.disabled = true;
+            submitBtn.style.opacity = "0.7";
             btnText.textContent = "AI is Analyzing Profile...";
-            loader.style.display = "block";
+            loader.style.display = "inline-block";
 
             try {
                 // 1. Get High-Accuracy Prediction from Render Backend (Direct Gemini Call)
@@ -231,6 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function resetBtn() {
         submitBtn.disabled = false;
+        submitBtn.style.opacity = "1";
         btnText.textContent = "Initialize AI Assessment";
         loader.style.display = "none";
     }
