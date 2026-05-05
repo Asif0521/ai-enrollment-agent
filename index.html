@@ -474,17 +474,19 @@
             detailsSave.textContent = 'Save ₹' + save + ' - Limited Time';
 
             const downloadBtn = document.getElementById('download-brochure-btn');
-            if (courseName === 'Full Stack Development') {
+            const nameLower = courseName.toLowerCase();
+            
+            if (nameLower.includes('full stack') || nameLower.includes('fullstack')) {
                 downloadBtn.href = 'fullstack-brochure.pdf';
                 downloadBtn.download = 'FullStack_Brochure.pdf';
-            } else if (courseName === 'Data Science with AI/ML') {
+            } else if (nameLower.includes('data science') || nameLower.includes('analytics') || nameLower.includes('ai')) {
                 downloadBtn.href = 'data-analytics-brochure.pdf';
                 downloadBtn.download = 'DataScience_Brochure.pdf';
-            } else if (courseName === 'UI/UX Design') {
+            } else if (nameLower.includes('ui') || nameLower.includes('ux') || nameLower.includes('design')) {
                 downloadBtn.href = 'uiux-brochure.pdf';
                 downloadBtn.download = 'UIUX_Brochure.pdf';
             } else {
-                downloadBtn.href = 'brochure.pdf';
+                downloadBtn.href = 'fullstack-brochure.pdf';
                 downloadBtn.download = 'TechU_Brochure.pdf';
             }
 
