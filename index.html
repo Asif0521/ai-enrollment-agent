@@ -322,14 +322,16 @@
                     <label for="career_goal">Desired Career Goal</label>
                     <div class="input-wrapper">
                         <i class="ph-bold ph-briefcase input-icon"></i>
-                        <input type="text" id="career_goal" list="goals_list" placeholder="e.g. Data Scientist, Full Stack Developer" required>
-                        <datalist id="goals_list">
-                            <option value="Data Scientist">
-                            <option value="Full Stack Developer">
-                            <option value="UI/UX Designer">
-                            <option value="AI/ML Engineer">
-                            <option value="Product Manager">
-                        </datalist>
+                        <select id="career_goal" required class="custom-select">
+                            <option value="" disabled selected>Select your career goal</option>
+                            <option value="Data Scientist">Data Scientist</option>
+                            <option value="Full Stack Developer">Full Stack Developer</option>
+                            <option value="UI/UX Designer">UI/UX Designer</option>
+                            <option value="AI/ML Engineer">AI/ML Engineer</option>
+                            <option value="Product Manager">Product Manager</option>
+                            <option value="AI Engineer">AI Engineer</option>
+                            <option value="Other">Other / Not Listed</option>
+                        </select>
                     </div>
                 </div>
 

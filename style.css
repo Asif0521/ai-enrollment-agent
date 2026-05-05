@@ -251,9 +251,28 @@ label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-
 .input-wrapper { position: relative; display: flex; align-items: center; }
 .input-icon { position: absolute; left: 1rem; color: var(--text-muted); font-size: 1.1rem; }
 .textarea-icon { top: 1rem; }
-input[type="text"], input[type="email"], textarea, .custom-select { width: 100%; background: white; border: 1px solid var(--border-subtle); border-radius: 10px; padding: 0.875rem 1rem 0.875rem 2.75rem; color: var(--text-primary); font-family: inherit; font-size: 0.95rem; transition: all 0.2s ease; }
+input[type="text"], input[type="email"], textarea, .custom-select { 
+    width: 100%; 
+    background: white; 
+    border: 1px solid var(--border-subtle); 
+    border-radius: 10px; 
+    padding: 0.875rem 1rem 0.875rem 2.75rem; 
+    color: var(--text-primary); 
+    font-family: inherit; 
+    font-size: 0.95rem; 
+    transition: all 0.2s ease; 
+}
+
+.custom-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 256 256'%3E%3Cpath d='M213.66,101.66l-80,80a8,8,0,0,1-11.32,0l-80-80a8,8,0,0,1,11.32-11.32L128,164.69l74.34-74.35a8,8,0,0,1,11.32,11.32Z'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    cursor: pointer;
+}
+
 input:focus, textarea:focus, .custom-select:focus { outline: none; border-color: var(--accent-magenta); box-shadow: 0 0 0 3px rgba(166, 43, 121, 0.15); }
-input:focus + .input-icon, textarea:focus + .input-icon, .custom-select:focus ~ .input-icon { color: var(--accent-magenta); }
+.input-wrapper:focus-within .input-icon { color: var(--accent-magenta); }
 .slider-group { margin-bottom: 2.5rem; }
 .slider-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .gpa-badge { background: rgba(166, 43, 121, 0.1); color: var(--accent-magenta); padding: 0.25rem 0.75rem; border-radius: 20px; font-weight: 700; font-size: 0.85rem; border: 1px solid rgba(166, 43, 121, 0.2); }
