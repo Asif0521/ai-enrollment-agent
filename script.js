@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update GPA value display dynamically
     if (gpaInput) {
         gpaInput.addEventListener('input', (e) => {
-            gpaValue.textContent = parseFloat(e.target.value).toFixed(1);
+            gpaValue.innerHTML = parseFloat(e.target.value).toFixed(1) + ' <span class="gpa-max">/ 10.0</span>';
         });
     }
 
@@ -146,10 +146,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const otherList = document.getElementById('otherCoursesList');
                 
                 const allInternalCourses = [
-                    "Full Stack Web Development",
-                    "Data Science & AI",
-                    "Cloud DevOps Engineering",
-                    "Cybersecurity Specialist"
+                    "Full Stack Development",
+                    "Data Science with AI/ML",
+                    "UI/UX Design"
                 ];
 
                 const recommendedNames = recommendations.map(r => r.course_name);
@@ -159,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     otherSection.classList.remove('hidden');
                     otherList.innerHTML = '';
                     otherCourses.forEach((courseName, index) => {
-                        const card = createCourseCard({ course_name: courseName, fit_score: 60, match_reason: "This program is also available in our current catalog." }, "Standard", index);
+                        const card = createCourseCard({ course_name: courseName, fit_score: 60, match_reason: "This program is also available in our current catalog." }, "Medium", index);
                         otherList.appendChild(card);
                     });
                 } else {
@@ -204,16 +203,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Helper to create external course cards
     function createExternalCard(item, index) {
         const card = document.createElement('div');
-        card.className = 'course-card';
+        card.className = `course-card fit-${(item.fit_level || 'medium').toLowerCase()}`;
         card.style.border = '1px dashed var(--accent-magenta)';
         card.style.background = 'rgba(79, 70, 229, 0.02)';
         
         card.innerHTML = `
-            <div class="card-badge" style="background: var(--text-primary);">External Track</div>
+            <div class="card-badge" style="background: var(--text-primary); color: white;">External Track</div>
             <h4>${item.course_name}</h4>
             <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent-magenta); margin-bottom: 0.5rem;">
                 <i class="ph-bold ph-globe"></i> ${item.platform}
             </div>
+            ${item.fit_score ? `
+            <div class="fit-score-container">
+                <div class="score-bar">
+                    <div class="score-fill" style="width: ${item.fit_score}%"></div>
+                </div>
+                <span class="score-text">${item.fit_score}% Fit</span>
+            </div>` : ''}
             <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
                 ${item.reason}
             </p>
@@ -224,41 +230,20 @@ document.addEventListener('DOMContentLoaded', () => {
         return card;
     }
 
-            } catch (error) {
-                console.error("Network Error:", error);
-                alert("Could not reach the AI Agent (Server offline). Displaying offline preview.");
-                // Execute fallback logic if completely unreachable
-                form.classList.add('hidden');
-                resultCard.classList.remove('hidden');
-                const recommendationsList = document.getElementById('recommendationsList');
-                recommendationsList.innerHTML = `
-                    <div class="course-card fit-high">
-                        <div class="card-badge">High Match</div>
-                        <h4>Full Stack Development</h4>
-                        <div class="fit-score-container">
-                            <div class="score-bar"><div class="score-fill" style="width: 95%"></div></div>
-                            <span class="score-text">95% Fit</span>
-                        </div>
-                        <p class="match-reason" style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1rem; line-height: 1.4;">
-                            Perfect match for your technical background.
-                        </p>
-                        <button class="enroll-btn" onclick="enrollInCourse('Full Stack Development', 95)">View Course Details</button>
-                    </div>`;
-            } finally {
-                resetBtn();
-            }
-        });
-    }
+
 
     window.enrollInCourse = async (courseName, score) => {
+        const event = window.event; // Capture the event object
         const email = document.getElementById('email').value;
         const name = document.getElementById('name').value;
 
         // Visual feedback
-        const btn = event.target;
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = "Finalizing...";
+        const btn = event ? event.target : null;
+        const originalText = btn ? btn.textContent : "View Course Details";
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = "Finalizing...";
+        }
 
         try {
             // Send webhook (don't block UI if it fails)
@@ -307,6 +292,24 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = originalText;
         }
     };
+
+    function showOfflineResults() {
+        form.classList.add('hidden');
+        resultCard.classList.remove('hidden');
+        const recommendationsList = document.getElementById('recommendationsList');
+        recommendationsList.innerHTML = '';
+        
+        const offlineMatches = [
+            { course_name: "Full Stack Development", fit_score: 95, fit_level: "High", match_reason: "Based on general tech trends, this is our most popular career-starting program." },
+            { course_name: "Data Science with AI/ML", fit_score: 85, fit_level: "High", match_reason: "Excellent for analytical minds looking to enter the AI space." }
+        ];
+
+        offlineMatches.forEach((item, index) => {
+            recommendationsList.appendChild(createCourseCard(item, item.fit_level, index));
+        });
+        
+        console.log("Offline results displayed.");
+    }
 
     function resetBtn() {
         submitBtn.disabled = false;

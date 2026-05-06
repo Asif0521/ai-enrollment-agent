@@ -399,6 +399,16 @@ input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); }
     color: #f59e0b;
 }
 
+.fit-low .card-badge {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+}
+
+.fit-standard .card-badge {
+    background: rgba(100, 116, 139, 0.1);
+    color: #64748b;
+}
+
 .fit-score-container {
     margin-bottom: 1.5rem;
 }

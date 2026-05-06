@@ -453,7 +453,7 @@
                         <span id="gpa-value" class="gpa-badge">7.5 <span class="gpa-max">/ 10.0</span></span>
                     </div>
                     <div class="range-wrapper">
-                        <input type="range" id="gpa" min="0" max="10" step="0.1" value="7.5">
+                        <input type="range" id="gpa" min="0" max="10" step="0.1" value="7.5" oninput="document.getElementById('gpa-value').innerHTML = parseFloat(this.value).toFixed(1) + ' <span class=\'gpa-max\'>/ 10.0</span>'">
                     </div>
                 </div>
 

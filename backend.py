@@ -114,6 +114,8 @@ async def recommend_course(profile: StudentProfile):
         {{
           "course_name": "External Course/Cert Name",
           "platform": "e.g., Coursera / Certification Board",
+          "fit_score": 80,
+          "fit_level": "Medium",
           "reason": "Why this matches their specialized skills/goals."
         }}
       ]
